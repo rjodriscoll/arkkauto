@@ -1,19 +1,16 @@
 import alpaca_trade_api as tradeapi
 import pandas as pd
 from ta.momentum import RSIIndicator
-from dotenv import load_dotenv
-import os
+from utils import alpaca_keys
 
-load_dotenv()
-alpaca_key = os.getenv("alpaca_api_key")
-api_secret = os.getenv("alpaca_secret_key")
+alpaca_key, alpaca_secret = alpaca_keys()
 
 
 class MeanReversion:
     def __init__(
         self,
         api_key: str = alpaca_key,
-        api_secret: str = api_secret,
+        api_secret: str = alpaca_secret,
         base_url: str = "https://paper-api.alpaca.markets",
         target_allocations: dict[str, float] = {"SPY": 0.4, "TQQQ": 0.3, "UVXY": 0.3},
     ):
