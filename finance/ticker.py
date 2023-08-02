@@ -1,5 +1,4 @@
 import alpaca_trade_api as tradeapi
-import pandas as pd
 from ta.momentum import RSIIndicator
 from ta.trend import SMAIndicator
 from utils import alpaca_keys
@@ -20,25 +19,22 @@ class Ticker:
         api_key=alpaca_key,
         api_secret=alpaca_secret,
         base_url="https://paper-api.alpaca.markets",
-        end_date=datetime.now(),
-        start_date=datetime.now() - timedelta(days=365),
+        end_date=(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d') ,
+        start_date=(datetime.now() - timedelta(days=366)).strftime("%Y-%m-%d"),
     ):
         self.symbol = symbol
-        self.api = tradeapi.REST(api_key, api_secret, base_url=base_url)
-        self.data = self.get_data()
-        self.start_date = start_date
+        self.api = tradeapi.REST(
+            key_id=api_key, secret_key=api_secret, base_url=base_url
+        )
+        self.start_date = start_date # - 1 here because of rate limits
         self.end_date = end_date
         self.data = self.get_data()
-        self.company_info = self.get_company_info()
         self.yf_info = self.get_yf_info()
 
     def get_data(self):
-        return self.api.get_barset(
-            self.symbol, "day", start=self.start_date, end=self.end_date
-        ).df[self.symbol]
-
-    def get_company_info(self):
-        return self.api.polygon.company(self.symbol)
+        return self.api.get_bars(
+            self.symbol, "1D", start=self.start_date, end=self.end_date
+        ).df.reset_index()
 
     def get_yf_info(self):
         return yf.Ticker(self.symbol).info
@@ -53,19 +49,15 @@ class Ticker:
 
     @property
     def market_cap(self):
-        return self.company_info.marketcap
+        return self.yf_info["marketCap"]
 
     @property
     def pe_ratio(self):
-        return self.company_info.peratio
+        return self.yf_info["trailingPE"]
 
     @property
     def peg_ratio(self):
         return self.yf_info["pegRatio"]
-
-    @property
-    def ps_ratio(self):
-        return self.yf_info["priceToSalesTrailing12Months"]
 
     @property
     def pb_ratio(self):
@@ -74,14 +66,6 @@ class Ticker:
     @property
     def dividend_yield(self):
         return self.yf_info["dividendYield"]
-
-    @property
-    def debt_to_equity(self):
-        return self.yf_info["debtToEquity"]
-
-    @property
-    def return_on_equity(self):
-        return self.yf_info["returnOnEquity"]
 
     @property
     def eps(self):
