@@ -64,10 +64,6 @@ class Ticker:
         return self.yf_info["priceToBook"]
 
     @property
-    def dividend_yield(self):
-        return self.yf_info["dividendYield"]
-
-    @property
     def eps(self):
         return self.yf_info["trailingEps"]
 
@@ -78,7 +74,10 @@ class Ticker:
     @property
     def beta(self):
         return self.yf_info["beta"]
-
+    @property
+    def current_price(self):
+        return self.data.iloc[-1]["close"]
+    
     @property
     def mean_recommendation(self):
         df = YQTicker(self.symbol).recommendation_trend.reset_index()
@@ -98,7 +97,7 @@ class Ticker:
             else:
                 # Subtract the number of months from the current date
                 period = (
-                    datetime.now() - relativedelta(months=int(period[:-1]))
+                    datetime.now() + relativedelta(months=int(period[:-1]))
                 ).strftime("%Y-%m")
             mean_values[period] = mean_value
         return mean_values
