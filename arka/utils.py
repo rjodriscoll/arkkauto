@@ -7,3 +7,8 @@ def alpaca_keys():
     alpaca_key = os.getenv("alpaca_api_key")
     alpaca_secret = os.getenv("alpaca_api_secret")
     return alpaca_key, alpaca_secret
+
+def openai_key():
+    load_dotenv()
+    return os.getenv("OPENAI_API_KEY")
+
