@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ticker import Ticker
+from arka.ticker import Ticker
 import pandas as pd
 from tqdm import tqdm
 from enum import Enum
